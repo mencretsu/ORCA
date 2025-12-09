@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORCA QR Code Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #333;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .qr-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .qr-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .qr-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .qr-id {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+            display: inline-block;
+        }
+
+        .qr-image {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .qr-image img {
+            width: 100%;
+            height: auto;
+            max-width: 250px;
+        }
+
+        .qr-url {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐋 ORCA QR Code Generator</h1>
+            <p style="color: #666; font-size: 1.1em; margin-bottom: 20px;">
+                Generate QR codes untuk kaos limited edition kamu
+            </p>
+
+            <div class="controls">
+                <div class="input-group">
+                    <label>Base URL:</label>
+                    <input type="text" id="baseUrl" value="https://mencretsu.github.io/ORCA/orca.html">
+                </div>
+                <div class="input-group">
+                    <label>Mulai dari ID:</label>
+                    <input type="number" id="startId" value="1" min="1">
+                </div>
+                <div class="input-group">
+                    <label>Total QR Code:</label>
+                    <input type="number" id="totalQr" value="20" min="1" max="500">
+                </div>
+                <div class="input-group">
+                    <label>Ukuran QR (px):</label>
+                    <input type="number" id="qrSize" value="300" min="200" max="1000" step="50">
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="generateQRCodes()">
+                    🎨 Generate QR Codes
+                </button>
+                <button class="btn btn-secondary" onclick="downloadAll()" id="downloadAllBtn" disabled>
+                    📦 Download Semua (ZIP)
+                </button>
+            </div>
+
+            <div class="info-box">
+                <h3>📋 Cara Pakai:</h3>
+                <ul>
+                    <li>Masukkan base URL (sudah diisi dengan URL ORCA kamu)</li>
+                    <li>Tentukan ID awal dan jumlah QR code yang mau di-generate</li>
+                    <li>Klik "Generate QR Codes"</li>
+                    <li>Download satu-satu atau sekaligus</li>
+                    <li>Print QR code ke kaos!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="qrContainer"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        let qrData = [];
+
+        function generateQRCodes() {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const startId = parseInt(document.getElementById('startId').value);
+            const totalQr = parseInt(document.getElementById('totalQr').value);
+            const qrSize = parseInt(document.getElementById('qrSize').value);
+            const container = document.getElementById('qrContainer');
+
+            // Show loading
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Generating ${totalQr} QR Codes...</p>
+                </div>
+            `;
+
+            qrData = [];
+
+            // Generate QR codes
+            setTimeout(() => {
+                let html = '<div class="qr-grid">';
+                
+                for (let i = 0; i < totalQr; i++) {
+                    const currentId = startId + i;
+                    const url = `${baseUrl}?id=${currentId}`;
+                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(url)}`;
+                    
+                    qrData.push({
+                        id: currentId,
+                        url: url,
+                        qrUrl: qrUrl
+                    });
+
+                    html += `
+                        <div class="qr-card">
+                            <div class="qr-header">
+                                <span class="qr-id">ID: ${currentId}</span>
+                            </div>
+                            <div class="qr-image">
+                                <img src="${qrUrl}" alt="QR Code ${currentId}">
+                            </div>
+                            <div class="qr-url">${url}</div>
+                            <button class="btn btn-primary" onclick="downloadSingle(${i})" style="width: 100%;">
+                                📥 Download
+                            </button>
+                        </div>
+                    `;
+                }
+
+                html += '</div>';
+                container.innerHTML = html;
+
+                // Enable download all button
+                document.getElementById('downloadAllBtn').disabled = false;
+            }, 100);
+        }
+
+        function downloadSingle(index) {
+            const qr = qrData[index];
+            fetch(qr.qrUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `orca-qr-${qr.id}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(err => {
+                    alert('Error downloading QR code: ' + err.message);
+                });
+        }
+
+        async function downloadAll() {
+            if (qrData.length === 0) {
+                alert('Generate QR codes dulu!');
+                return;
+            }
+
+            const btn = document.getElementById('downloadAllBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Downloading...';
+
+            try {
+                const zip = new JSZip();
+                const folder = zip.folder('orca-qr-codes');
+
+                // Download all QR codes
+                for (let i = 0; i < qrData.length; i++) {
+                    const qr = qrData[i];
+                    try {
+                        const response = await fetch(qr.qrUrl);
+                        const blob = await response.blob();
+                        folder.file(`orca-qr-${qr.id}.png`, blob);
+                        
+                        // Update progress
+                        btn.textContent = `⏳ ${i + 1}/${qrData.length}...`;
+                    } catch (err) {
+                        console.error(`Error downloading QR ${qr.id}:`, err);
+                    }
+                }
+
+                // Generate ZIP
+                const content = await zip.generateAsync({type: 'blob'});
+                
+                // Download ZIP
+                const url = window.URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'orca-qr-codes.zip';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                btn.textContent = '✅ Download Selesai!';
+                setTimeout(() => {
+                    btn.textContent = '📦 Download Semua (ZIP)';
+                    btn.disabled = false;
+                }, 2000);
+            } catch (err) {
+                alert('Error creating ZIP: ' + err.message);
+                btn.textContent = '📦 Download Semua (ZIP)';
+                btn.disabled = false;
+            }
+        }
+
+        // Auto-generate on load
+        window.addEventListener('load', () => {
+            generateQRCodes();
+        });
+    </script>
+</body>
+</html>
