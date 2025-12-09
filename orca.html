@@ -1,1 +1,606 @@
-gjhgjhg
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kecoaxx Dashboard</title>
+<style>
+body { font-family:"Roboto", sans-serif; background:#121212; color:#e0e0e0; margin:0; padding:8px; }
+h1 { text-align:center; margin:8px 0 12px 0; font-size:1.2rem; color:#fff; }
+.table-container { overflow-x:auto; margin-bottom:10px; -webkit-overflow-scrolling:touch; }
+table { width:100%; border-collapse:collapse; background:#1e1e1e; border-radius:6px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.6); font-size:0.7rem; }
+thead { background:#272727; position:sticky; top:0; z-index:10; }
+th, td { padding:6px 4px; text-align:left; cursor:default; }
+th { color:#90caf9; font-weight:480; border-bottom:1px solid #333; white-space:nowrap; font-size:0.65rem; }
+tr:nth-child(even) { background:#2a2a2a; }
+tr:hover { background:#333; }
+td { border-bottom:1px solid #2c2c2c; vertical-align:middle; font-size:0.68rem; }
+.empty { text-align:center; padding:12px; color:#888; }
+.filters { margin-bottom:8px; display:flex; gap:6px; flex-wrap:wrap; }
+.filters input, .filters select { font-size:0.75rem; padding:6px 8px; background:#1e1e1e; color:#e0e0e0; border:1px solid #333; border-radius:4px; flex:1; min-width:100px; }
+th.sortable { cursor:pointer; }
+.stats { display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+.stat-box { background:#1e1e1e; padding:8px 12px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.6); font-size:0.7rem; flex:1; min-width:90px; text-align:center; }
+.stat-box .label { font-size:0.65rem; opacity:0.8; margin-bottom:2px; }
+.stat-box .value { font-weight:bold; color:#90caf9; display:block; font-size:0.85rem; margin-top:2px; }
+.stat-box.clickable { cursor:pointer; transition:background 0.2s; }
+.stat-box.clickable:hover { background:#2a2a2a; }
+button { margin-top:0; padding:6px 10px; background:#90caf9; color:#121212; border:none; border-radius:4px; cursor:pointer; font-size:0.75rem; width:100%; }
+#sentChart { width: 100%; height: 280px; }
+
+.chart-controls { 
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px; 
+  margin-bottom: 10px;
+}
+.chart-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.chart-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.chart-checkbox.c-blue input[type="checkbox"] { accent-color: #90caf9; }
+.chart-checkbox.c-green input[type="checkbox"] { accent-color: #4caf50; }
+.chart-checkbox.c-orange input[type="checkbox"] { accent-color: #ff9800; }
+.chart-checkbox.c-purple input[type="checkbox"] { accent-color: #ab47bc; }
+.chart-checkbox.c-cyan input[type="checkbox"] { accent-color: #26c6da; }
+
+.chart-checkbox label {
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #e0e0e0;
+  line-height: 1.2;
+}
+
+/* SVG Battery Styles */
+.battery-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+}
+
+.battery-svg {
+  width: 50px;
+  height: 25px;
+  flex-shrink: 0;
+}
+
+.battery-svg.unknown {
+  opacity: 0.4;
+}
+
+.battery-tooltip {
+  position: relative;
+  cursor: help;
+  display: inline-block;
+}
+
+.battery-tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 5px;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  body { padding: 6px; }
+  h1 { font-size: 1.1rem; margin: 6px 0 10px 0; }
+  table { font-size: 0.65rem; }
+  th, td { padding: 5px 3px; }
+  th { font-size: 0.62rem; }
+  td { font-size: 0.64rem; }
+  .battery-container { min-width: 45px; }
+  .battery-svg { width: 45px; height: 22px; }
+  .stats { gap: 6px; margin-bottom: 6px; }
+  .stat-box { padding: 6px 8px; font-size: 0.65rem; min-width: 80px; }
+  .stat-box .value { font-size: 0.8rem; }
+  .filters { gap: 5px; margin-bottom: 6px; }
+  .filters input, .filters select { font-size: 0.7rem; padding: 5px 6px; min-width: 90px; }
+  button { padding: 5px 8px; font-size: 0.7rem; }
+  #sentChart { height: 240px; }
+  .chart-controls { grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
+  .chart-checkbox input[type="checkbox"] { width: 14px; height: 14px; }
+  .chart-checkbox label { font-size: 0.7rem; }
+}
+
+@media (max-width: 480px) {
+  body { padding: 4px; }
+  h1 { font-size: 1rem; margin: 5px 0 8px 0; }
+  table { font-size: 0.6rem; }
+  th, td { padding: 4px 2px; }
+  th { font-size: 0.58rem; }
+  td { font-size: 0.6rem; }
+  .battery-svg { width: 40px; height: 20px; }
+  .stat-box { padding: 5px 6px; font-size: 0.6rem; min-width: 70px; }
+  .stat-box .value { font-size: 0.75rem; }
+  .filters input, .filters select { font-size: 0.65rem; padding: 4px 5px; }
+  button { padding: 4px 6px; font-size: 0.65rem; }
+  #sentChart { height: 200px; }
+  .chart-checkbox label { font-size: 0.65rem; }
+}
+</style>
+</head>
+<body>
+
+<h1>Kecoaxx Dashboard</h1>
+
+<div class="stats">
+  <div class="stat-box">
+    <div class="label">Active</div>
+    <span class="value" id="stat-active">0</span>
+  </div>
+  <div class="stat-box clickable" id="total-sent-box" title="Klik untuk lihat history">
+    <div class="label">Total Sent</div>
+    <span class="value" id="stat-sent">0</span>
+  </div>
+  <div class="stat-box">
+    <div class="label">Total API</div>
+    <span class="value" id="stat-totalapi">0</span>
+  </div>
+</div>
+
+<div class="filters">
+  <input type="text" id="searchInput" placeholder="Cari nama, app, atau versi..." />
+  <select id="timeRange">
+    <option value="today">Hari ini</option>
+    <option value="all">Semua</option>
+  </select>
+  <select id="statusFilter">
+    <option value="active">Show Active</option>
+    <option value="inactive">Show Inactive</option>
+    <option value="all">Show All</option>
+  </select>
+  <button id="refreshBtn">Refresh Data</button>
+</div>
+
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th class="sortable">Sent ▲▼</th>
+        <th>Bat</th>
+        <th>App</th>
+        <th>Dev</th>
+        <th>Bot</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="devices-table">
+      <tr><td colspan="7" class="empty">Loading data...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="history-section" style="text-align:center;font-weight:500;font-size:0.9rem;color:#90caf9;margin:16px 0 10px 0;">-- Stats --</div>
+
+<div class="chart-controls">
+  <div class="chart-checkbox c-blue">
+    <input type="checkbox" id="check-total-sent">
+    <label for="check-total-sent">Total Sent</label>
+  </div>
+  <div class="chart-checkbox c-green">
+    <input type="checkbox" id="check-avg-device" checked>
+    <label for="check-avg-device">Avg per Device</label>
+  </div>
+  <div class="chart-checkbox c-orange">
+    <input type="checkbox" id="check-daily-growth">
+    <label for="check-daily-growth">Daily Growth %</label>
+  </div>
+  <div class="chart-checkbox c-purple">
+    <input type="checkbox" id="check-efficiency-growth">
+    <label for="check-efficiency-growth">Efficiency Growth %</label>
+  </div>
+  <div class="chart-checkbox c-cyan">
+    <input type="checkbox" id="check-active-devices">
+    <label for="check-active-devices">Active Devices</label>
+  </div>
+</div>
+
+<div id="sentChart"></div>
+
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBWrIDwTn4Byd9gZdYeGtwVUe0q2f2KYT4",
+  authDomain: "kecoaxx-db898.firebaseapp.com",
+  databaseURL: "https://kecoaxx-db898-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kecoaxx-db898",
+  storageBucket: "kecoaxx-db898.firebasestorage.app",
+  messagingSenderId: "929070876762",
+  appId: "1:929070876762:web:696c8699f91e8022cc7063"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const devicesRef = ref(db, "devices");
+const sentHistoryRef = ref(db, "sentHistory");
+const apiKeysRef = ref(db, "apiKeys/list");
+
+const searchInput = document.getElementById("searchInput");
+const timeRange = document.getElementById("timeRange");
+const statusFilter = document.getElementById("statusFilter");
+const table = document.getElementById("devices-table");
+const statActive = document.getElementById("stat-active");
+const statSent = document.getElementById("stat-sent");
+const statTotalApi = document.getElementById("stat-totalapi");
+
+let devicesData = [];
+let sortSentAsc = false;
+
+// Render SVG Battery Icon
+function renderBattery(batteryLevel) {
+  if (batteryLevel === undefined || batteryLevel === null || batteryLevel < 0) {
+    return `
+      <div class="battery-tooltip" data-tooltip="Unknown">
+        <div class="battery-container">
+          <svg class="battery-svg unknown" viewBox="0 0 100 50">
+            <rect x="5" y="10" width="75" height="30" rx="3" ry="3" fill="none" stroke="#666" stroke-width="2"/>
+            <rect x="80" y="18" width="8" height="14" rx="2" ry="2" fill="#666"/>
+            <text x="42.5" y="32" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#888" text-anchor="middle">?</text>
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
+  const clampedLevel = Math.max(0, Math.min(100, batteryLevel));
+  const fillWidth = (clampedLevel / 100) * 69;
+  
+  let fillColor = "#4caf50";
+  if (clampedLevel < 15) fillColor = "#d32f2f";
+  else if (clampedLevel < 30) fillColor = "#f44336";
+  else if (clampedLevel < 70) fillColor = "#ff9800";
+
+  const textColor = "#fff";
+  const fontSize = clampedLevel === 100 ? "16" : "18";
+
+  return `
+    <div class="battery-tooltip" data-tooltip="Baterai: ${clampedLevel}%">
+      <div class="battery-container">
+        <svg class="battery-svg" viewBox="0 0 100 50">
+          <rect x="5" y="10" width="75" height="30" rx="3" ry="3" fill="none" stroke="#666" stroke-width="2"/>
+          <rect x="80" y="18" width="8" height="14" rx="2" ry="2" fill="#666"/>
+          <rect x="8" y="13" width="${fillWidth}" height="24" rx="2" ry="2" fill="${fillColor}"/>
+          <text x="42.5" y="32" font-family="Arial, sans-serif" font-size="${fontSize}" font-weight="bold" fill="${textColor}" text-anchor="middle">${clampedLevel}%</text>
+        </svg>
+      </div>
+    </div>
+  `;
+}
+
+function renderTable() {
+  table.innerHTML = "";
+  let filtered = devicesData.filter(d => {
+    const searchTerm = searchInput.value.toLowerCase();
+    const name = (d.botName || "").toLowerCase();
+    const app = (d.pkgName || "").toLowerCase();
+    const version = (d.appVersion || "").toLowerCase();
+    
+    return name.includes(searchTerm) || app.includes(searchTerm) || version.includes(searchTerm);
+  });
+  
+  filtered = filtered.filter(d => {
+    const sent = timeRange.value === "today" ? (d.sentToday ?? 0) : (d.totalSent ?? 0);
+    const isActive = sent > 0;
+    
+    if (statusFilter.value === "active") return isActive;
+    if (statusFilter.value === "inactive") return !isActive;
+    return true;
+  });
+  
+  filtered.sort((a, b) => {
+    const valA = timeRange.value === "today" ? (a.sentToday ?? 0) : (a.totalSent ?? 0);
+    const valB = timeRange.value === "today" ? (b.sentToday ?? 0) : (b.totalSent ?? 0);
+    return valB - valA;
+  });
+  
+  filtered.forEach(d => {
+    let sent = timeRange.value === "today" ? (d.sentToday ?? 0) : (d.totalSent ?? 0);
+    const val = v => v ? v : "-";
+    
+    const batteryLevel = d.battery !== undefined ? d.battery : 
+                        d.batteryLevel !== undefined ? d.batteryLevel : 
+                        null;
+    
+    table.innerHTML += `
+      <tr>
+        <td>${val(d.botName)}</td>
+        <td>${val(sent)}</td>
+        <td>${renderBattery(batteryLevel)}</td>
+        <td>${val(d.pkgName)}</td>
+        <td>${val(d.deviceName || d.id)}</td>
+        <td>${val(d.appVersion ? "v." + d.appVersion : "")}</td>
+        <td>${val(d.status)}</td>
+      </tr>`;
+  });
+  if (filtered.length === 0) table.innerHTML = `<tr><td colspan="7" class="empty">Tidak ada data</td></tr>`;
+}
+
+async function fetchDevices() {
+  try {
+    const snapshot = await get(devicesRef);
+    devicesData = [];
+    let totalSent = 0, activeCount = 0;
+
+    snapshot.forEach(child => {
+      const d = child.val();
+      d.id = child.key;
+
+      let sentValue = 0;
+      if (timeRange.value === "today" && d.hasOwnProperty('sentToday')) sentValue = d.sentToday;
+      else if (timeRange.value === "all" && d.hasOwnProperty('totalSent')) sentValue = d.totalSent;
+
+      if (sentValue > 0) activeCount++;
+      totalSent += sentValue;
+      d._sentValue = sentValue;
+      devicesData.push(d);
+    });
+
+    statActive.textContent = activeCount;
+    statSent.textContent = totalSent;
+    renderTable();
+  } catch (err) {
+    console.error("Error devices:", err);
+    table.innerHTML = `<tr><td colspan="7" class="empty">Error ambil data</td></tr>`;
+  }
+}
+
+async function fetchApiKeysCount() {
+  try {
+    const snapshot = await get(apiKeysRef);
+    let apiCount = 0;
+    snapshot.forEach(() => { apiCount++; });
+    statTotalApi.textContent = apiCount;
+  } catch (err) {
+    console.error("Error API keys:", err);
+    statTotalApi.textContent = "0";
+  }
+}
+
+let chartData = {
+  labels: [],
+  totalSentData: [],
+  avgPerDeviceData: [],
+  dailyGrowthData: [],
+  efficiencyGrowthData: [],
+  activeDevicesData: []
+};
+
+async function fetchSentHistory() {
+  try {
+    const snapshot = await get(sentHistoryRef);
+    const allDates = [];
+    snapshot.forEach(child => { 
+      const data = child.val();
+      allDates.push({ 
+        date: child.key, 
+        totalSent: data.totalSent ?? 0,
+        activeDevices: data.activeDevices ?? 0
+      }); 
+    });
+    
+    allDates.sort((a, b) => a.date.localeCompare(b.date));
+    
+    chartData.labels = allDates.map(d => d.date);
+    chartData.totalSentData = allDates.map(d => d.totalSent);
+    chartData.activeDevicesData = allDates.map(d => d.activeDevices);
+    chartData.avgPerDeviceData = allDates.map(d => {
+      return d.activeDevices > 0 ? parseFloat((d.totalSent / d.activeDevices).toFixed(2)) : 0;
+    });
+
+    chartData.dailyGrowthData = allDates.map((d, i) => {
+      if (i === 0) return 0;
+      const prev = allDates[i - 1].totalSent;
+      if (prev === 0) return 0;
+      return parseFloat((((d.totalSent - prev) / prev) * 100).toFixed(2));
+    });
+
+    chartData.efficiencyGrowthData = allDates.map((d, i) => {
+      if (i === 0) return 0;
+      const currAvg = d.activeDevices > 0 ? d.totalSent / d.activeDevices : 0;
+      const prevAvg = allDates[i - 1].activeDevices > 0 ? allDates[i - 1].totalSent / allDates[i - 1].activeDevices : 0;
+      if (prevAvg === 0) return 0;
+      return parseFloat((((currAvg - prevAvg) / prevAvg) * 100).toFixed(2));
+    });
+
+    updateChart();
+  } catch (err) {
+    console.error("Error history:", err);
+  }
+}
+
+function updateChart() {
+  const showTotalSent = document.getElementById('check-total-sent').checked;
+  const showAvgDevice = document.getElementById('check-avg-device').checked;
+  const showDailyGrowth = document.getElementById('check-daily-growth').checked;
+  const showEfficiencyGrowth = document.getElementById('check-efficiency-growth').checked;
+  const showActiveDevices = document.getElementById('check-active-devices').checked;
+  
+  const traces = [];
+  let yaxisCounter = 1;
+
+  const getYAxis = () => {
+    if (yaxisCounter === 1) {
+      yaxisCounter++;
+      return 'y';
+    }
+    const axis = `y${yaxisCounter}`;
+    yaxisCounter++;
+    return axis;
+  };
+  
+  if (showTotalSent) {
+    traces.push({
+      x: chartData.labels,
+      y: chartData.totalSentData,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Total Sent',
+      yaxis: getYAxis(),
+      line: { color: '#90caf9', width: 2, shape: 'spline' },
+      marker: { color: '#90caf9', size: 5 }
+    });
+  }
+
+  if (showAvgDevice) {
+    traces.push({
+      x: chartData.labels,
+      y: chartData.avgPerDeviceData,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Avg per Device',
+      yaxis: getYAxis(),
+      line: { color: '#4caf50', width: 2, shape: 'spline' },
+      marker: { color: '#4caf50', size: 5 }
+    });
+  }
+
+  if (showDailyGrowth) {
+    traces.push({
+      x: chartData.labels,
+      y: chartData.dailyGrowthData,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Daily Growth %',
+      yaxis: getYAxis(),
+      line: { color: '#ff9800', width: 2, shape: 'spline' },
+      marker: { color: '#ff9800', size: 5 }
+    });
+  }
+
+  if (showEfficiencyGrowth) {
+    traces.push({
+      x: chartData.labels,
+      y: chartData.efficiencyGrowthData,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Efficiency Growth %',
+      yaxis: getYAxis(),
+      line: { color: '#ab47bc', width: 2, shape: 'spline' },
+      marker: { color: '#ab47bc', size: 5 }
+    });
+  }
+
+  if (showActiveDevices) {
+    traces.push({
+      x: chartData.labels,
+      y: chartData.activeDevicesData,
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Active Devices',
+      yaxis: getYAxis(),
+      line: { color: '#26c6da', width: 2, shape: 'spline' },
+      marker: { color: '#26c6da', size: 5 }
+    });
+  }
+
+  const layout = {
+    paper_bgcolor: '#121212',
+    plot_bgcolor: '#1e1e1e',
+    font: { color: '#e0e0e0' },
+    xaxis: {
+      gridcolor: 'rgba(255,255,255,0.1)',
+      showgrid: true,
+      color: '#fff'
+    },
+    yaxis: {
+      gridcolor: 'rgba(255,255,255,0.1)',
+      showgrid: true,
+      color: '#fff'
+    },
+    margin: { l: 50, r: 50, t: 20, b: 50 },
+    hovermode: 'x unified',
+    dragmode: 'pan',
+    showlegend: false
+  };
+
+  const colors = ['#90caf9', '#4caf50', '#ff9800', '#ab47bc', '#26c6da'];
+  let colorIdx = 0;
+  
+  traces.forEach((trace, idx) => {
+    if (idx > 0 && trace.yaxis !== 'y') {
+      const yaxisNum = trace.yaxis.replace('y', '');
+      layout[`yaxis${yaxisNum}`] = {
+        overlaying: 'y',
+        side: idx % 2 === 0 ? 'right' : 'left',
+        position: idx > 2 ? (idx % 2 === 0 ? 0.95 - (idx * 0.05) : 0.05 + (idx * 0.05)) : undefined,
+        color: colors[colorIdx % colors.length],
+        showgrid: false
+      };
+      colorIdx++;
+    }
+  });
+
+  const config = {
+    responsive: true,
+    displayModeBar: true,
+    modeBarButtonsToRemove: ['lasso2d', 'select2d'],
+    scrollZoom: true,
+    displaylogo: false
+  };
+
+  Plotly.newPlot('sentChart', traces, layout, config);
+}
+
+document.getElementById('check-total-sent').addEventListener('change', updateChart);
+document.getElementById('check-avg-device').addEventListener('change', updateChart);
+document.getElementById('check-daily-growth').addEventListener('change', updateChart);
+document.getElementById('check-efficiency-growth').addEventListener('change', updateChart);
+document.getElementById('check-active-devices').addEventListener('change', updateChart);
+
+async function refreshAll() {
+  await fetchDevices();
+  await fetchApiKeysCount();
+  await fetchSentHistory();
+}
+
+refreshAll();
+
+document.getElementById("refreshBtn").addEventListener("click", refreshAll);
+
+document.getElementById("total-sent-box").addEventListener("click", () => {
+  document.getElementById("history-section").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+[searchInput, timeRange, statusFilter].forEach(el => el.addEventListener("change", renderTable));
+searchInput.addEventListener("input", renderTable);
+
+document.querySelector("th.sortable").addEventListener("click", () => {
+  devicesData.sort((a, b) => {
+    const valA = timeRange.value === "today" ? (a.sentToday ?? 0) : (a.totalSent ?? 0);
+    const valB = timeRange.value === "today" ? (b.sentToday ?? 0) : (b.totalSent ?? 0);
+    return sortSentAsc ? valB - valA : valA - valB;
+  });
+  sortSentAsc = !sortSentAsc;
+  renderTable();
+});
+</script>
+<footer style="text-align:center; padding:12px; font-size:0.75rem; color:#777; margin-top:20px;">
+  Powered by <span style="color:#90caf9;">mencretsu</span>
+</footer>
+</body>
+</html>
