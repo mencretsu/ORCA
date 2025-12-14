@@ -22,6 +22,11 @@
             color: white;
             min-height: 100vh;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: pan-y;
+            overscroll-behavior: none;
         }
 
         .bg-gradient {
@@ -33,6 +38,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             opacity: 0.1;
             z-index: 0;
+            will-change: opacity;
         }
 
         .bg-grid {
@@ -47,6 +53,7 @@
             background-size: 50px 50px;
             z-index: 0;
             animation: gridMove 20s linear infinite;
+            will-change: transform;
         }
 
         @keyframes gridMove {
@@ -63,23 +70,26 @@
             height: 100%;
             background: rgba(10, 14, 39, 0.95);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 10000;
+            padding: 20px;
         }
 
         .modal-content {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 50px 40px;
             border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             max-width: 450px;
-            width: 90%;
+            width: 100%;
             text-align: center;
-            animation: modalSlide 0.4s ease-out;
+            animation: modalSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes modalSlide {
@@ -110,6 +120,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 10px;
         }
 
@@ -128,7 +139,7 @@
             font-size: 16px;
             color: white;
             margin-bottom: 20px;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             font-family: 'Inter', monospace;
             letter-spacing: 1px;
@@ -155,14 +166,21 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 1px;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .modal-content button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        .modal-content button:active {
+            transform: scale(0.98);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .modal-content button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            }
         }
 
         .error-message {
@@ -172,6 +190,13 @@
             margin-bottom: 15px;
             text-align: left;
             padding-left: 5px;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
 
         .container {
@@ -202,6 +227,12 @@
         .logo {
             font-size: 48px;
             margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .header h1 {
@@ -210,6 +241,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 10px;
         }
 
@@ -231,6 +263,12 @@
             font-weight: 600;
             font-size: 14px;
             margin-top: 20px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
         }
 
         .main-grid {
@@ -249,11 +287,12 @@
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
             padding: 40px;
             animation: fadeInUp 0.6s ease-out;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes fadeInUp {
@@ -267,9 +306,12 @@
             }
         }
 
-        .glass-card:hover {
-            border-color: rgba(102, 126, 234, 0.3);
-            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+        @media (hover: hover) and (pointer: fine) {
+            .glass-card:hover {
+                border-color: rgba(102, 126, 234, 0.3);
+                box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+                transform: translateY(-2px);
+            }
         }
 
         .card-title {
@@ -289,6 +331,9 @@
             position: relative;
             overflow: hidden;
             perspective: 1000px;
+            touch-action: pan-x;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .flip-card {
@@ -297,6 +342,7 @@
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: transform;
         }
 
         .flip-card.flipped {
@@ -308,6 +354,7 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -328,6 +375,11 @@
             max-height: 80%;
             object-fit: contain;
             filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
         }
 
         .canvas-hint {
@@ -342,6 +394,12 @@
             border-radius: 20px;
             pointer-events: none;
             z-index: 10;
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
 
         .loading-overlay {
@@ -351,6 +409,8 @@
             width: 100%;
             height: 100%;
             background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -393,14 +453,22 @@
             border-radius: 10px;
             color: white;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 13px;
             font-weight: 600;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .view-btn:hover {
-            background: rgba(102, 126, 234, 0.2);
-            border-color: #667eea;
+        .view-btn:active {
+            transform: scale(0.95);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .view-btn:hover {
+                background: rgba(102, 126, 234, 0.2);
+                border-color: #667eea;
+                transform: translateY(-2px);
+            }
         }
 
         .view-btn.active {
@@ -423,13 +491,20 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 20;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .rotate-btn:hover {
-            background: rgba(102, 126, 234, 0.3);
-            transform: scale(1.1);
+        .rotate-btn:active {
+            transform: scale(0.9) rotate(180deg);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .rotate-btn:hover {
+                background: rgba(102, 126, 234, 0.3);
+                transform: scale(1.1) rotate(0deg);
+            }
         }
 
         .details-grid {
@@ -443,6 +518,14 @@
             padding: 20px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .detail-item:hover {
+                background: rgba(255, 255, 255, 0.08);
+                transform: translateY(-2px);
+            }
         }
 
         .detail-label {
@@ -485,6 +568,7 @@
             font-size: 12px;
             color: #667eea;
             font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .certificate-id {
@@ -542,12 +626,106 @@
             height: 8px;
             background: rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .page-dot.active {
             background: #667eea;
-            transform: scale(1.2);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .logo {
+                font-size: 40px;
+            }
+
+            .glass-card {
+                padding: 25px;
+            }
+
+            .card-title {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+
+            .image-container {
+                height: 400px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .certificate {
+                padding: 25px;
+            }
+
+            .certificate h3 {
+                font-size: 20px;
+            }
+
+            .qr-placeholder {
+                width: 120px;
+                height: 120px;
+            }
+
+            .certificate-checks {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .rotate-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+
+            .canvas-hint {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 15px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .header .subtitle {
+                font-size: 16px;
+            }
+
+            .modal-content {
+                padding: 35px 25px;
+            }
+
+            .modal-content h2 {
+                font-size: 28px;
+            }
+
+            .image-container {
+                height: 350px;
+            }
+
+            .detail-value {
+                font-size: 16px;
+            }
+
+            .certificate-id {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -565,6 +743,7 @@
                 id="idInput" 
                 placeholder="orca.01.26.001" 
                 autofocus
+                autocomplete="off"
                 maxlength="15"
             >
             <div id="errorMessage" class="error-message" style="display: none;"></div>
@@ -604,7 +783,7 @@
                         ⇄
                     </button>
                     
-                    <div class="canvas-hint">Click flip button to view back design</div>
+                    <div class="canvas-hint">Swipe or tap to flip design</div>
                     
                     <div class="page-indicator">
                         <div class="page-dot active" id="dotFront"></div>
@@ -613,9 +792,9 @@
                 </div>
 
                 <div class="view-controls">
-                    <button class="view-btn active" onclick="zoomIn()">✚</button>
-                    <button class="view-btn" onclick="zoomOut()">▬</button>
-                    <button class="view-btn" onclick="resetView()">🗙</button>
+                    <button class="view-btn" onclick="zoomIn()">✚ Zoom</button>
+                    <button class="view-btn" onclick="zoomOut()">▬ Zoom</button>
+                    <button class="view-btn" onclick="resetView()">↻ Reset</button>
                 </div>
             </div>
 
@@ -646,7 +825,7 @@
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Status</div>
-                            <div class="detail-value" style="color: #10b981;">Active</div>
+                            <div class="detail-value" style="color: #10b981;">✓ Active</div>
                         </div>
                     </div>
 
@@ -714,7 +893,6 @@
             const frontImage = document.getElementById('frontImage');
             const backImage = document.getElementById('backImage');
             
-            // Add cache busting
             const timestamp = new Date().getTime();
             const frontUrl = `${baseUrls.front}?nocache=${timestamp}`;
             const backUrl = `${baseUrls.back}?nocache=${timestamp}`;
@@ -726,12 +904,13 @@
                 function onImageLoad() {
                     imagesLoaded++;
                     if (imagesLoaded === totalImages) {
-                        hideLoading();
-                        resolve();
+                        setTimeout(() => {
+                            hideLoading();
+                            resolve();
+                        }, 300);
                     }
                 }
                 
-                // Load front image
                 frontImage.onload = onImageLoad;
                 frontImage.onerror = () => {
                     console.error('Failed to load front image');
@@ -740,7 +919,6 @@
                 };
                 frontImage.src = frontUrl;
                 
-                // Load back image
                 backImage.onload = onImageLoad;
                 backImage.onerror = () => {
                     console.error('Failed to load back image');
@@ -758,9 +936,6 @@
             document.getElementById('editionId').textContent = orcaId.toUpperCase();
             document.getElementById('certificateId').textContent = `ORCA-GENESIS-${number}-2024`;
             document.getElementById('headerEdition').textContent = number;
-            
-            // Optional: Update image URLs based on ID if needed
-            // loadImages();
         }
 
         function submitId() {
@@ -775,7 +950,7 @@
             }
 
             if (!validateOrcaId(id)) {
-                errorMsg.textContent = '⚠️ Invalid format. Use: orca.XX.XX.XXX (e.g., orca.01.26.001)';
+                errorMsg.textContent = '⚠️ Invalid format. Use: orca.XX.XX.XXX';
                 errorMsg.style.display = 'block';
                 return;
             }
@@ -783,7 +958,12 @@
             const newUrl = `${window.location.pathname}?id=${encodeURIComponent(id)}`;
             window.history.pushState({}, '', newUrl);
             
-            document.getElementById('idModal').style.display = 'none';
+            const modal = document.getElementById('idModal');
+            modal.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+            
             updateIdDisplay(id);
         }
 
@@ -806,21 +986,19 @@
 
         function zoomIn() {
             const images = document.querySelectorAll('.design-image');
-            currentScale = Math.min(currentScale + 0.1, 2);
+            currentScale = Math.min(currentScale + 0.2, 2.5);
             
             images.forEach(img => {
                 img.style.transform = `scale(${currentScale})`;
-                img.style.transition = 'transform 0.3s ease';
             });
         }
 
         function zoomOut() {
             const images = document.querySelectorAll('.design-image');
-            currentScale = Math.max(currentScale - 0.1, 0.5);
+            currentScale = Math.max(currentScale - 0.2, 0.5);
             
             images.forEach(img => {
                 img.style.transform = `scale(${currentScale})`;
-                img.style.transition = 'transform 0.3s ease';
             });
         }
 
@@ -830,31 +1008,27 @@
             
             images.forEach(img => {
                 img.style.transform = 'scale(1)';
-                img.style.transition = 'transform 0.3s ease';
             });
             
-            // Also reset flip if needed
             if (isFlipped) {
                 flipImage();
             }
         }
 
-        // Add keyboard controls
+        // Keyboard controls
         document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT') return;
+            
             switch(e.key) {
                 case 'ArrowLeft':
-                case 'a':
-                case 'A':
                     if (isFlipped) flipImage();
                     break;
                 case 'ArrowRight':
-                case 'd':
-                case 'D':
                     if (!isFlipped) flipImage();
                     break;
                 case '+':
                 case '=':
-                    if (e.shiftKey) zoomIn();
+                    zoomIn();
                     break;
                 case '-':
                 case '_':
@@ -870,31 +1044,59 @@
             }
         });
 
-        // Add touch swipe support
+        // Touch swipe support
         let touchStartX = 0;
         let touchEndX = 0;
+        let touchStartY = 0;
+        let touchEndY = 0;
+        let isSwiping = false;
         
         const imageContainer = document.querySelector('.image-container');
         
         imageContainer.addEventListener('touchstart', function(e) {
             touchStartX = e.changedTouches[0].screenX;
-        });
+            touchStartY = e.changedTouches[0].screenY;
+            isSwiping = true;
+        }, { passive: true });
+
+        imageContainer.addEventListener('touchmove', function(e) {
+            if (!isSwiping) return;
+            
+            const touchCurrentX = e.changedTouches[0].screenX;
+            const touchCurrentY = e.changedTouches[0].screenY;
+            
+            const deltaX = Math.abs(touchCurrentX - touchStartX);
+            const deltaY = Math.abs(touchCurrentY - touchStartY);
+            
+            if (deltaX > deltaY && deltaX > 10) {
+                e.preventDefault();
+            }
+        }, { passive: false });
         
         imageContainer.addEventListener('touchend', function(e) {
+            if (!isSwiping) return;
+            
             touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
             handleSwipe();
-        });
+            isSwiping = false;
+        }, { passive: true });
+        
+        imageContainer.addEventListener('touchcancel', function() {
+            isSwiping = false;
+        }, { passive: true });
         
         function handleSwipe() {
             const swipeThreshold = 50;
-            const difference = touchStartX - touchEndX;
+            const differenceX = touchStartX - touchEndX;
+            const differenceY = Math.abs(touchStartY - touchEndY);
             
-            if (Math.abs(difference) > swipeThreshold) {
-                if (difference > 0 && !isFlipped) {
-                    // Swipe left, show back
+            if (differenceY > 100) return;
+            
+            if (Math.abs(differenceX) > swipeThreshold) {
+                if (differenceX > 0 && !isFlipped) {
                     flipImage();
-                } else if (difference < 0 && isFlipped) {
-                    // Swipe right, show front
+                } else if (differenceX < 0 && isFlipped) {
                     flipImage();
                 }
             }
@@ -902,13 +1104,32 @@
 
         // Initialize
         document.getElementById('idInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') submitId();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitId();
+            }
         });
 
         document.getElementById('idInput').addEventListener('input', function() {
             document.getElementById('errorMessage').style.display = 'none';
         });
 
+        // Prevent double-tap zoom
+        let lastTap = 0;
+        document.addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                if (e.target.closest('.view-btn') || e.target.closest('.rotate-btn') || e.target.closest('button')) {
+                    return;
+                }
+                e.preventDefault();
+            }
+            lastTap = currentTime;
+        }, { passive: false });
+
+        // Page initialization
         window.addEventListener('DOMContentLoaded', function() {
             const existingId = getIdFromUrl();
             
@@ -919,7 +1140,6 @@
                 document.getElementById('idModal').style.display = 'flex';
             }
 
-            // Set current date
             const today = new Date();
             document.getElementById('currentDate').textContent = 
                 today.toLocaleDateString('en-US', { 
@@ -928,7 +1148,6 @@
                     day: 'numeric' 
                 });
 
-            // Load images
             loadImages();
         });
     </script>
