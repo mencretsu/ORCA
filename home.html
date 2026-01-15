@@ -121,13 +121,18 @@
             line-height:1.2;
             word-wrap:break-word;
         }
-        .hero p{
-            font-size:16px;
-            color:rgba(255,255,255,.7);
-            margin-bottom:30px;
-            line-height:1.6;
-            max-width:100%;
+
+        /* Typing Animation Container */
+        .typing-container {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            min-height: 80px;
+            text-align: center;
         }
+        
         .btn-group{
             display:flex;
             flex-direction:column;
@@ -312,7 +317,11 @@
             .hero{padding:120px 40px}
             .hero-badge{padding:12px 24px;font-size:14px}
             .hero h1{font-size:72px;margin-bottom:30px}
-            .hero p{font-size:22px;margin-bottom:50px}
+            .typing-container {
+                font-size: 22px;
+                margin-bottom: 50px;
+                min-height: 100px;
+            }
             .btn-group{flex-direction:row;justify-content:center}
             .btn{width:auto;margin:0 10px}
             .stats{padding:80px 40px}
@@ -367,10 +376,12 @@
     <div>
         <div class="hero-badge translate-text" data-en="✨ Limited to 500 Pieces" data-id="✨ Terbatas 500 Piece">✨ Limited to 500 Pieces</div>
         <h1 class="translate-text" data-en="Discover Exclusive ORCA Limited Edition" data-id="Temukan ORCA Edisi Terbatas Eksklusif">Discover Exclusive ORCA Limited Edition</h1>
-        <p class="translate-text" data-en="Own a piece of digital art. Each ORCA NFT is uniquely numbered, verified on blockchain, and crafted with premium quality." data-id="Miliki karya seni digital. Setiap ORCA NFT diberi nomor unik, terverifikasi di blockchain, dan dibuat dengan kualitas premium.">
-            Own a piece of digital art. Each ORCA NFT is uniquely numbered,
-            verified on blockchain, and crafted with premium quality.
-        </p>
+        
+        <!-- Container untuk animasi typing -->
+        <div class="typing-container">
+            <p id="typing-text"></p>
+        </div>
+        
         <div class="btn-group">
             <a href="#featured" class="btn btn-primary translate-text" data-en="Explore Collection" data-id="Jelajahi Koleksi">Explore Collection</a>
             <a href="#about" class="btn btn-secondary translate-text" data-en="Learn More" data-id="Pelajari Lebih Lanjut">Learn More</a>
@@ -484,7 +495,73 @@
 <script>
 let currentLang = 'en';
 
+// Typing Animation Script (No Blink)
+const typingTexts = {
+    en: [
+        "Own a piece of digital art. Each ORCA NFT is uniquely numbered, verified on blockchain, and crafted with premium quality.",
+        "Exclusive limited edition collection. Only 500 pieces will ever exist in the digital universe.",
+        "Verified authenticity. Every ORCA comes with a unique QR code linked to the blockchain.",
+        "Join an elite community. Collectors of ORCA gain access to exclusive benefits and future drops."
+    ],
+    id: [
+        "Miliki karya seni digital. Setiap ORCA NFT diberi nomor unik, terverifikasi di blockchain, dan dibuat dengan kualitas premium.",
+        "Koleksi edisi terbatas eksklusif. Hanya 500 piece yang akan ada di alam digital.",
+        "Keaslian terverifikasi. Setiap ORCA dilengkapi kode QR unik yang terhubung ke blockchain.",
+        "Bergabunglah dengan komunitas elit. Kolektor ORCA mendapatkan akses ke manfaat eksklusif dan rilis masa depan."
+    ]
+};
+
+let currentTextIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+let isPaused = false;
+let typingSpeed = 30;
+let deletingSpeed = 10;
+let pauseTime = 2500;
+
+function typeText() {
+    const textElement = document.getElementById('typing-text');
+    const currentTextArray = typingTexts[currentLang];
+    const currentText = currentTextArray[currentTextIndex];
+    
+    if (!isDeleting && !isPaused) {
+        // Typing mode
+        textElement.textContent = currentText.substring(0, charIndex + 1);
+        charIndex++;
+        
+        // Selesai mengetik, pause sebentar
+        if (charIndex === currentText.length) {
+            isPaused = true;
+            setTimeout(() => {
+                isPaused = false;
+                isDeleting = true;
+            }, pauseTime);
+        }
+    } else if (isDeleting && !isPaused) {
+        // Deleting mode
+        textElement.textContent = currentText.substring(0, charIndex - 1);
+        charIndex--;
+        
+        // Selesai menghapus, ganti ke text berikutnya
+        if (charIndex === 0) {
+            isDeleting = false;
+            currentTextIndex = (currentTextIndex + 1) % currentTextArray.length;
+            
+            // Jeda sebentar sebelum mulai mengetik lagi
+            isPaused = true;
+            setTimeout(() => {
+                isPaused = false;
+            }, 500);
+        }
+    }
+    
+    // Atur kecepatan berdasarkan mode
+    const speed = isDeleting ? deletingSpeed : typingSpeed;
+    setTimeout(typeText, isPaused ? 100 : speed);
+}
+
 function toggleLanguage() {
+    // Toggle bahasa
     currentLang = currentLang === 'en' ? 'id' : 'en';
     const langIndicator = document.getElementById('lang-indicator');
     
@@ -494,13 +571,35 @@ function toggleLanguage() {
         langIndicator.textContent = '🇮🇩 ID';
     }
 
+    // Update semua teks yang ada data translation
     document.querySelectorAll('.translate-text').forEach(el => {
         const text = el.getAttribute(`data-${currentLang}`);
         if (text) {
             el.textContent = text;
         }
     });
+
+    // Reset animasi typing untuk bahasa baru
+    currentTextIndex = 0;
+    charIndex = 0;
+    isDeleting = false;
+    isPaused = false;
+    
+    // Kosongkan text dulu
+    document.getElementById('typing-text').textContent = "";
+    
+    // Mulai animasi baru
+    setTimeout(typeText, 300);
 }
+
+// Initialize typing animation saat halaman load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set text awal sesuai bahasa default
+    document.getElementById('typing-text').textContent = "";
+    
+    // Mulai animasi setelah 1 detik
+    setTimeout(typeText, 1000);
+});
 </script>
 
 </body>
