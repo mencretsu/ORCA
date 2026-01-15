@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRESALE - Pre-Order Sekarang!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,0,100,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0,100,255,0.2) 0%, transparent 50%);
+        }
+
+        .logo {
+            font-size: 4em;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255,0,128,0.5);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .tagline {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #ff8c00;
+            font-weight: bold;
+        }
+
+        .date {
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            color: #40e0d0;
+        }
+
+        .countdown {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .countdown-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .countdown-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ff0080;
+        }
+
+        .countdown-label {
+            font-size: 0.9em;
+            color: #ccc;
+            text-transform: uppercase;
+        }
+
+        .ticket-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            padding: 0 20px;
+        }
+
+        .ticket-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticket-card:hover {
+            transform: translateY(-10px);
+            border-color: #ff0080;
+            box-shadow: 0 20px 40px rgba(255,0,128,0.3);
+        }
+
+        .ticket-card.popular::before {
+            content: '🔥 TERLARIS';
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: #ff0080;
+            color: white;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .ticket-type {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #40e0d0;
+        }
+
+        .ticket-price {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #ff8c00;
+            margin-bottom: 20px;
+        }
+
+        .ticket-price small {
+            font-size: 0.4em;
+            color: #999;
+        }
+
+        .ticket-features {
+            list-style: none;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .ticket-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+        }
+
+        .ticket-features li::before {
+            content: '✓ ';
+            color: #40e0d0;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .buy-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff0080, #ff8c00);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .buy-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255,0,128,0.5);
+        }
+
+        .stock-info {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #ff0080;
+            font-weight: bold;
+        }
+
+        .info-section {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ff8c00;
+        }
+
+        .info-section p {
+            line-height: 1.8;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .venue-info {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .venue-item {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+        }
+
+        .venue-item h3 {
+            color: #40e0d0;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .logo { font-size: 2.5em; }
+            .tagline { font-size: 1.2em; }
+            .date { font-size: 1.3em; }
+            .countdown-number { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="logo">ORCA - PRESALE</div>
+        <div class="tagline">Premium Streetwear Collection</div>
+        <div class="date">📅 Pre-Order Batch 2 - Januari 2026</div>
+        
+        <div class="countdown" id="countdown">
+            <div class="countdown-item">
+                <div class="countdown-number" id="days">00</div>
+                <div class="countdown-label">Hari</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="hours">00</div>
+                <div class="countdown-label">Jam</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="minutes">00</div>
+                <div class="countdown-label">Menit</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="seconds">00</div>
+                <div class="countdown-label">Detik</div>
+            </div>
+        </div>
+
+        <div class="ticket-section">
+            <div class="ticket-card">
+                <div class="ticket-type">BASIC TEE</div>
+                <div class="ticket-price">
+                    Rp 89K
+                    <small>/ pcs</small>
+                </div>
+                <ul class="ticket-features">
+                    <li>Cotton Combed 30s</li>
+                    <li>Sablon Plastisol Premium</li>
+                    <li>Size: S - XXL</li>
+                    <li>Gratis Sticker Pack</li>
+                </ul>
+                <a href="#" class="buy-button" onclick="handlePurchase('Basic Tee', event)">PRE-ORDER SEKARANG</a>
+                <div class="stock-info">⚡ Slot Tersisa: 78</div>
+            </div>
+
+            <div class="ticket-card popular">
+                <div class="ticket-type">PREMIUM TEE</div>
+                <div class="ticket-price">
+                    Rp 149K
+                    <small>/ pcs</small>
+                </div>
+                <ul class="ticket-features">
+                    <li>Cotton Combed 24s</li>
+                    <li>Sablon DTF Full Color</li>
+                    <li>Size: S - XXXL</li>
+                    <li>Embroidery Detail</li>
+                    <li>Hang Tag Premium</li>
+                </ul>
+                <a href="#" class="buy-button" onclick="handlePurchase('Premium Tee', event)">PRE-ORDER SEKARANG</a>
+                <div class="stock-info">🔥 Slot Tersisa: 34</div>
+            </div>
+
+            <div class="ticket-card">
+                <div class="ticket-type">LIMITED EDITION</div>
+                <div class="ticket-price">
+                    Rp 249K
+                    <small>/ pcs</small>
+                </div>
+                <ul class="ticket-features">
+                    <li>Cotton Combed 20s</li>
+                    <li>Sablon 3D Emboss</li>
+                    <li>All Size Available</li>
+                    <li>Numbered Certificate</li>
+                    <li>Exclusive Packaging</li>
+                    <li>Bonus Tote Bag</li>
+                </ul>
+                <a href="#" class="buy-button" onclick="handlePurchase('Limited Edition', event)">PRE-ORDER SEKARANG</a>
+                <div class="stock-info">💎 Slot Tersisa: 12</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2>Tentang Presale</h2>
+        <p>Presale  hadir dengan koleksi streetwear premium yang dirancang khusus untuk anak muda Indonesia. Setiap desain dibuat dengan detail yang sempurna dan bahan berkualitas tinggi.</p>
+        <p>Pre-order batch 2 ini limited edition - begitu sold out, design tidak akan dicetak ulang lagi!</p>
+
+        <div class="venue-info">
+            <div class="venue-item">
+                <h3>📦 Pengiriman</h3>
+                <p>Estimasi 14-21 hari<br>Setelah PO ditutup</p>
+            </div>
+            <div class="venue-item">
+                <h3>💳 Pembayaran</h3>
+                <p>Transfer Bank<br>E-Wallet / QRIS</p>
+            </div>
+            <div class="venue-item">
+                <h3>🎁 Bonus</h3>
+                <p>Pembelian 3pcs+<br>Gratis ongkir Jawa!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Countdown Timer - PO Closing Date
+        const eventDate = new Date('2026-01-31T23:59:59').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = eventDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById('countdown').innerHTML = '<h2>PRE-ORDER DITUTUP!</h2>';
+            }
+        }
+
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        function handlePurchase(productType, event) {
+            event.preventDefault();
+            alert(`Terima kasih! Anda memilih ${productType}.\n\nDalam implementasi nyata, link ini akan mengarahkan ke:\n- Form order Google Form\n- WhatsApp untuk konfirmasi\n- Payment gateway\n\nContoh: https://wa.me/628123456789?text=Halo, saya mau pre-order ${productType}`);
+        }
+    </script>
+</body>
+</html>
