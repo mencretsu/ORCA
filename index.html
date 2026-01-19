@@ -869,9 +869,14 @@
         let currentScale = 1;
         let orcaDatabase = null;
         
-        const baseUrls = {
-            front: 'https://raw.githubusercontent.com/mencretsu/ORCA/main/assets/v1/front.png',
-            back: 'https://raw.githubusercontent.com/mencretsu/ORCA/main/assets/v1/back.png'
+        // Base URL untuk assets
+        const assetsBaseUrl = 'https://raw.githubusercontent.com/mencretsu/ORCA/main/assets/v1/';
+        
+        // Mapping warna ke prefix file
+        const colorMap = {
+            'hitam': 'b',      // bback.png, bfront.png
+            'putih': 'w',      // wback.png, wfront.png
+            'hitam putih': 'b' // default ke hitam
         };
 
         // SHA-256 hash function
@@ -918,11 +923,15 @@
             document.getElementById('loadingOverlay').classList.remove('active');
         }
 
-        async function loadImages() {
+        async function loadImages(colorPrefix = 'b') {
             showLoading();
             const frontImage = document.getElementById('frontImage');
             const backImage = document.getElementById('backImage');
             const timestamp = new Date().getTime();
+            
+            // Tentukan file berdasarkan prefix warna
+            const frontUrl = `${assetsBaseUrl}${colorPrefix}front.png`;
+            const backUrl = `${assetsBaseUrl}${colorPrefix}back.png`;
             
             return new Promise((resolve) => {
                 let loaded = 0;
@@ -935,14 +944,14 @@
                     frontImage.src = 'https://via.placeholder.com/400x500/1a1a2e/667eea?text=ORCA+FRONT';
                     onLoad();
                 };
-                frontImage.src = `${baseUrls.front}?t=${timestamp}`;
+                frontImage.src = `${frontUrl}?t=${timestamp}`;
                 
                 backImage.onload = onLoad;
                 backImage.onerror = () => {
                     backImage.src = 'https://via.placeholder.com/400x500/1a1a2e/764ba2?text=ORCA+BACK';
                     onLoad();
                 };
-                backImage.src = `${baseUrls.back}?t=${timestamp}`;
+                backImage.src = `${backUrl}?t=${timestamp}`;
             });
         }
 
@@ -956,6 +965,18 @@
             if (data) {
                 document.getElementById('colorValue').textContent = data.warna || '-';
                 document.getElementById('sizeValue').textContent = data.ukuran || '-';
+                
+                // Load images sesuai warna
+                const warna = data.warna.toLowerCase();
+                let colorPrefix = 'b'; // default hitam
+                
+                if (warna.includes('putih') && !warna.includes('hitam')) {
+                    colorPrefix = 'w'; // putih
+                } else if (warna.includes('hitam')) {
+                    colorPrefix = 'b'; // hitam
+                }
+                
+                loadImages(colorPrefix);
             }
         }
 
@@ -1128,12 +1149,14 @@
             if (verified && storedId && storedData) {
                 document.getElementById('idModal').style.display = 'none';
                 updateIdDisplay(storedId, JSON.parse(storedData));
+            } else {
+                // Load default images jika belum verify
+                loadImages('b');
             }
             
             document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { 
                 year: 'numeric', month: 'short', day: 'numeric' 
             });
-            loadImages();
 
             document.addEventListener('click', (e) => {
                 const menu = document.getElementById('navbarMenu');
