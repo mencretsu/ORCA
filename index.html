@@ -923,62 +923,75 @@
             document.getElementById('loadingOverlay').classList.remove('active');
         }
 
-        async function loadImages(colorPrefix = 'b') {
-            showLoading();
-            const frontImage = document.getElementById('frontImage');
-            const backImage = document.getElementById('backImage');
-            const timestamp = new Date().getTime();
-            
-            // Tentukan file berdasarkan prefix warna
-            const frontUrl = `${assetsBaseUrl}${colorPrefix}front.png`;
-            const backUrl = `${assetsBaseUrl}${colorPrefix}back.png`;
-            
-            return new Promise((resolve) => {
-                let loaded = 0;
-                const onLoad = () => {
-                    if (++loaded === 2) setTimeout(() => { hideLoading(); resolve(); }, 300);
-                };
-                
-                frontImage.onload = onLoad;
-                frontImage.onerror = () => {
-                    frontImage.src = 'https://via.placeholder.com/400x500/1a1a2e/667eea?text=ORCA+FRONT';
-                    onLoad();
-                };
-                frontImage.src = `${frontUrl}?t=${timestamp}`;
-                
-                backImage.onload = onLoad;
-                backImage.onerror = () => {
-                    backImage.src = 'https://via.placeholder.com/400x500/1a1a2e/764ba2?text=ORCA+BACK';
-                    onLoad();
-                };
-                backImage.src = `${backUrl}?t=${timestamp}`;
-            });
-        }
+async function loadImages(colorPrefix = 'b') {
+    showLoading();
+    const frontImage = document.getElementById('frontImage');
+    const backImage = document.getElementById('backImage');
+    const timestamp = new Date().getTime();
+    
+    // Tentukan file berdasarkan prefix warna
+    const frontUrl = `${assetsBaseUrl}${colorPrefix}front.png`;
+    const backUrl = `${assetsBaseUrl}${colorPrefix}back.png`;
+    
+    console.log('🎨 Loading images:', { colorPrefix, frontUrl, backUrl }); // DEBUG
+    
+    return new Promise((resolve) => {
+        let loaded = 0;
+        const onLoad = () => {
+            if (++loaded === 2) setTimeout(() => { hideLoading(); resolve(); }, 300);
+        };
+        
+        frontImage.onload = onLoad;
+        frontImage.onerror = () => {
+            console.error('❌ Failed to load front image');
+            frontImage.src = 'https://via.placeholder.com/400x500/1a1a2e/667eea?text=ORCA+FRONT';
+            onLoad();
+        };
+        frontImage.src = `${frontUrl}?t=${timestamp}`;
+        
+        backImage.onload = onLoad;
+        backImage.onerror = () => {
+            console.error('❌ Failed to load back image');
+            backImage.src = 'https://via.placeholder.com/400x500/1a1a2e/764ba2?text=ORCA+BACK';
+            onLoad();
+        };
+        backImage.src = `${backUrl}?t=${timestamp}`;
+    });
+}
 
-        function updateIdDisplay(orcaId, data) {
-            const number = extractNumber(orcaId);
-            currentOrcaId = number;
-            document.getElementById('editionId').textContent = orcaId.toUpperCase();
-            document.getElementById('certificateId').textContent = `ORCA-GENESIS-${number}`;
-            document.getElementById('headerEdition').textContent = number;
-            
-            if (data) {
-                document.getElementById('colorValue').textContent = data.warna || '-';
-                document.getElementById('sizeValue').textContent = data.ukuran || '-';
-                
-                // Load images sesuai warna
-                const warna = data.warna.toLowerCase();
-                let colorPrefix = 'b'; // default hitam
-                
-                if (warna.includes('White') && !warna.includes('Black')) {
-                    colorPrefix = 'w'; // putih
-                } else if (warna.includes('Black')) {
-                    colorPrefix = 'b'; // hitam
-                }
-                
-                loadImages(colorPrefix);
-            }
+function updateIdDisplay(orcaId, data) {
+    const number = extractNumber(orcaId);
+    currentOrcaId = number;
+    document.getElementById('editionId').textContent = orcaId.toUpperCase();
+    document.getElementById('certificateId').textContent = `ORCA-GENESIS-${number}`;
+    document.getElementById('headerEdition').textContent = number;
+    
+    if (data) {
+        const warna = (data.warna || 'Black').toLowerCase();
+        console.log('🎨 Warna dari database:', warna); // DEBUG
+        
+        document.getElementById('colorValue').textContent = data.warna || '-';
+        document.getElementById('sizeValue').textContent = data.ukuran || '-';
+        
+        // Logic warna yang lebih robust
+        let colorPrefix = 'b'; // default hitam
+        
+        // Check keywords
+        if (warna.includes('white') || warna.includes('putih')) {
+            colorPrefix = 'w';
+            console.log('✅ Detected WHITE');
+        } else if (warna.includes('black') || warna.includes('hitam')) {
+            colorPrefix = 'b';
+            console.log('✅ Detected BLACK');
         }
+        
+        // Panggil load images dengan prefix yang bener
+        loadImages(colorPrefix);
+    } else {
+        console.warn('⚠️ No data provided, using default black');
+        loadImages('b');
+    }
+}
 
         async function submitId() {
             const idInput = document.getElementById('idInput');
