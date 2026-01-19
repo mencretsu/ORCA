@@ -61,7 +61,6 @@
             100% { transform: translateY(50px); }
         }
 
-        /* Navbar */
         .navbar {
             position: fixed;
             top: 0;
@@ -121,10 +120,6 @@
             color: #667eea;
         }
 
-        .navbar-menu a.active {
-            color: #667eea;
-        }
-
         .menu-toggle {
             display: none;
             background: none;
@@ -160,7 +155,6 @@
             }
         }
 
-        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -237,10 +231,10 @@
             border-radius: 12px;
             font-size: 16px;
             color: white;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
-            font-family: 'Inter', monospace;
+            font-family: 'Inter', sans-serif;
             letter-spacing: 1px;
         }
 
@@ -269,6 +263,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             -webkit-tap-highlight-color: transparent;
+            margin-bottom: 10px;
         }
 
         .modal-content button:active {
@@ -285,7 +280,7 @@
         .error-message {
             color: #ff6b6b;
             font-size: 13px;
-            margin-top: -15px;
+            margin-top: -10px;
             margin-bottom: 15px;
             text-align: left;
             padding-left: 5px;
@@ -752,12 +747,12 @@
 
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="/home.html" class="navbar-logo">
+            <a href="#" class="navbar-logo">
                 🐋 <span>ORCA</span>
             </a>
             <div class="navbar-menu" id="navbarMenu">
-                <a href="/home.html">Home</a>
-                <a href="/home.html#about">About</a>
+                <a href="#">Home</a>
+                <a href="#about">About</a>
             </div>
             <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
         </div>
@@ -767,14 +762,12 @@
         <div class="modal-content">
             <div class="modal-icon">🐋</div>
             <h2>ORCA</h2>
-            <p>Enter your unique edition ID to access your exclusive ORCA NFT showcase</p>
-            <input type="text" id="idInput" placeholder="xxxx.xx.xx.xx" autofocus autocomplete="off" maxlength="15">
+            <p>Enter your unique edition ID and signature</p>
+            <input type="text" id="idInput" placeholder="orca.xx.xx.xxx" autofocus autocomplete="off" maxlength="15">
+            <input type="text" id="signatureInput" placeholder="Signature (6 chars)" autocomplete="off" maxlength="6" style="text-transform: uppercase;">
             <div id="errorMessage" class="error-message" style="display: none;"></div>
-            <button onclick="submitId()">Verify & Enter</button><br><br>
-            <button onclick="window.location.href='https://www.orcaorigin.store/home'">
-                ORCA Homepage
-                </button>
-
+            <button onclick="submitId()">Verify & Enter</button>
+            <button onclick="window.location.href='https://www.orcaorigin.store/home'">ORCA Homepage</button>
         </div>
     </div>
 
@@ -784,7 +777,7 @@
             <h1>ORCA</h1>
             <p class="subtitle">Limited Edition Collection</p>
             <div class="edition-badge">
-                ✓ Verified Authentic • Edition <span id="headerEdition">000</span>/500
+                ✓ Verified Authentic • Edition <span id="headerEdition">000</span>/50
             </div>
         </div>
 
@@ -820,18 +813,22 @@
             <div>
                 <div class="glass-card">
                     <h3 class="card-title">Item Details</h3>
-                    <div class="details-grid">
+                    <div class="details-grid" id="detailsGrid">
                         <div class="detail-item">
                             <div class="detail-label">Edition ID</div>
-                            <div class="detail-value" id="editionId">orca.01.26.001</div>
+                            <div class="detail-value" id="editionId">orca.01.01.001</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Collection</div>
                             <div class="detail-value">Volume 01</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Total Supply</div>
-                            <div class="detail-value">500 Pieces</div>
+                            <div class="detail-label">Color</div>
+                            <div class="detail-value" id="colorValue">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Size</div>
+                            <div class="detail-value" id="sizeValue">-</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Material</div>
@@ -841,10 +838,6 @@
                             <div class="detail-label">Print Type</div>
                             <div class="detail-value">DTF Premium</div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Status</div>
-                            <div class="detail-value" style="color: #10b981;">✓ Active</div>
-                        </div>
                     </div>
                     <div class="certificate">
                         <h3>🏆 Certificate of Authenticity</h3>
@@ -852,7 +845,7 @@
                             This QR code verifies ownership of this exclusive piece
                         </p>
                         <div class="qr-placeholder">QR CODE</div>
-                        <div class="certificate-id" id="certificateId">ORCA-Vol-01-001-2024</div>
+                        <div class="certificate-id" id="certificateId">ORCA-Vol-01-001</div>
                         <div class="certificate-checks">
                             <div class="check-item">✓ Limited Edition</div>
                             <div class="check-item">✓ Verified Authentic</div>
@@ -873,186 +866,283 @@
     <script>
         let currentOrcaId = '000';
         let isFlipped = false;
-    let currentScale = 1;
-    const baseUrls = {
-        front: 'https://raw.githubusercontent.com/mencretsu/ORCA/main/assets/v1/front.png',
-        back: 'https://raw.githubusercontent.com/mencretsu/ORCA/main/assets/v1/back.png'
-    };
-
-    function toggleMenu() {
-        const menu = document.getElementById('navbarMenu');
-        const toggle = document.getElementById('menuToggle');
-        menu.classList.toggle('active');
-        toggle.textContent = menu.classList.contains('active') ? '✕' : '☰';
-    }
-
-    function validateOrcaId(id) {
-        return /^orca\.\d{2}\.\d{2}\.\d{3}$/.test(id.toLowerCase());
-    }
-
-    function getIdFromUrl() {
-        return new URLSearchParams(window.location.search).get('id');
-    }
-
-    function extractNumber(orcaId) {
-        return orcaId.split('.').pop();
-    }
-
-    function showLoading() {
-        document.getElementById('loadingOverlay').classList.add('active');
-    }
-
-    function hideLoading() {
-        document.getElementById('loadingOverlay').classList.remove('active');
-    }
-
-    async function loadImages() {
-        showLoading();
-        const frontImage = document.getElementById('frontImage');
-        const backImage = document.getElementById('backImage');
-        const timestamp = new Date().getTime();
+        let currentScale = 1;
+        let orcaDatabase = null;
         
-        return new Promise((resolve) => {
-            let loaded = 0;
-            const onLoad = () => {
-                if (++loaded === 2) setTimeout(() => { hideLoading(); resolve(); }, 300);
-            };
-            
-            frontImage.onload = onLoad;
-            frontImage.onerror = () => {
-                frontImage.src = 'https://via.placeholder.com/400x500/1a1a2e/667eea?text=ORCA+FRONT';
-                onLoad();
-            };
-            frontImage.src = `${baseUrls.front}?t=${timestamp}`;
-            
-            backImage.onload = onLoad;
-            backImage.onerror = () => {
-                backImage.src = 'https://via.placeholder.com/400x500/1a1a2e/764ba2?text=ORCA+BACK';
-                onLoad();
-            };
-            backImage.src = `${baseUrls.back}?t=${timestamp}`;
-        });
-    }
+        const baseUrls = {
+            front: 'https://raw.githubusercontent.com/mencretsu/ORCA/main/assets/v1/front.png',
+            back: 'https://raw.githubusercontent.com/mencretsu/ORCA/main/assets/v1/back.png'
+        };
 
-    function updateIdDisplay(orcaId) {
-        const number = extractNumber(orcaId);
-        currentOrcaId = number;
-        document.getElementById('editionId').textContent = orcaId.toUpperCase();
-        document.getElementById('certificateId').textContent = `ORCA-GENESIS-${number}-2024`;
-        document.getElementById('headerEdition').textContent = number;
-    }
-
-    function submitId() {
-        const input = document.getElementById('idInput');
-        const errorMsg = document.getElementById('errorMessage');
-        const id = input.value.trim().toLowerCase();
-        
-        if (!id) {
-            errorMsg.textContent = '⚠️ Please enter an ID';
-            errorMsg.style.display = 'block';
-            return;
+        // SHA-256 hash function
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message.toUpperCase());
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
-        if (!validateOrcaId(id)) {
-            errorMsg.textContent = '⚠️ Invalid format. Use: orca.XX.XX.XXX';
-            errorMsg.style.display = 'block';
-            return;
+
+        // Load database from GitHub
+        async function loadDatabase() {
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/mencretsu/ORCA/main/data/orca-v1.json');
+                if (!response.ok) throw new Error('Database not found');
+                orcaDatabase = await response.json();
+                return true;
+            } catch (error) {
+                console.error('Failed to load database:', error);
+                return false;
+            }
         }
-        
-        window.history.pushState({}, '', `${window.location.pathname}?id=${encodeURIComponent(id)}`);
-        const modal = document.getElementById('idModal');
-        modal.style.animation = 'fadeOut 0.3s ease-out';
-        setTimeout(() => { modal.style.display = 'none'; }, 300);
-        updateIdDisplay(id);
-    }
 
-    function flipImage() {
-        isFlipped = !isFlipped;
-        document.getElementById('flipCard').classList.toggle('flipped');
-        document.getElementById('dotFront').classList.toggle('active');
-        document.getElementById('dotBack').classList.toggle('active');
-    }
-
-    function zoomIn() {
-        currentScale = Math.min(currentScale + 0.2, 2.5);
-        document.querySelectorAll('.design-image').forEach(img => img.style.transform = `scale(${currentScale})`);
-    }
-
-    function zoomOut() {
-        currentScale = Math.max(currentScale - 0.2, 0.5);
-        document.querySelectorAll('.design-image').forEach(img => img.style.transform = `scale(${currentScale})`);
-    }
-
-    function resetView() {
-        currentScale = 1;
-        document.querySelectorAll('.design-image').forEach(img => img.style.transform = 'scale(1)');
-        if (isFlipped) flipImage();
-    }
-
-    document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT') return;
-        if (e.key === 'ArrowLeft' && isFlipped) flipImage();
-        if (e.key === 'ArrowRight' && !isFlipped) flipImage();
-        if (e.key === '+' || e.key === '=') zoomIn();
-        if (e.key === '-' || e.key === '_') zoomOut();
-        if (e.key === '0') resetView();
-        if (e.key === ' ') { flipImage(); e.preventDefault(); }
-    });
-
-    let touchStartX, touchEndX, touchStartY, touchEndY, isSwiping;
-    const container = document.querySelector('.image-container');
-    container.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
-        isSwiping = true;
-    }, { passive: true });
-
-    container.addEventListener('touchmove', (e) => {
-        if (!isSwiping) return;
-        const dx = Math.abs(e.changedTouches[0].screenX - touchStartX);
-        const dy = Math.abs(e.changedTouches[0].screenY - touchStartY);
-        if (dx > dy && dx > 10) e.preventDefault();
-    }, { passive: false });
-
-    container.addEventListener('touchend', (e) => {
-        if (!isSwiping) return;
-        touchEndX = e.changedTouches[0].screenX;
-        touchEndY = e.changedTouches[0].screenY;
-        const dx = touchStartX - touchEndX;
-        const dy = Math.abs(touchStartY - touchEndY);
-        if (dy < 100 && Math.abs(dx) > 50) {
-            if (dx > 0 && !isFlipped) flipImage();
-            else if (dx < 0 && isFlipped) flipImage();
-        }
-        isSwiping = false;
-    }, { passive: true });
-
-    document.getElementById('idInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); submitId(); }
-    });
-
-    document.getElementById('idInput').addEventListener('input', () => {
-        document.getElementById('errorMessage').style.display = 'none';
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const id = getIdFromUrl();
-        if (id && validateOrcaId(id)) {
-            document.getElementById('idModal').style.display = 'none';
-            updateIdDisplay(id);
-        }
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { 
-            year: 'numeric', month: 'short', day: 'numeric' 
-        });
-        loadImages();
-
-        document.addEventListener('click', (e) => {
+        function toggleMenu() {
             const menu = document.getElementById('navbarMenu');
             const toggle = document.getElementById('menuToggle');
-            if (menu.classList.contains('active') && !menu.contains(e.target) && !toggle.contains(e.target)) {
-                toggleMenu();
+            menu.classList.toggle('active');
+            toggle.textContent = menu.classList.contains('active') ? '✕' : '☰';
+        }
+
+        function validateOrcaId(id) {
+            return /^orca\.\d{2}\.\d{2}\.\d{3}$/.test(id.toLowerCase());
+        }
+
+        function extractNumber(orcaId) {
+            return orcaId.split('.').pop();
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        async function loadImages() {
+            showLoading();
+            const frontImage = document.getElementById('frontImage');
+            const backImage = document.getElementById('backImage');
+            const timestamp = new Date().getTime();
+            
+            return new Promise((resolve) => {
+                let loaded = 0;
+                const onLoad = () => {
+                    if (++loaded === 2) setTimeout(() => { hideLoading(); resolve(); }, 300);
+                };
+                
+                frontImage.onload = onLoad;
+                frontImage.onerror = () => {
+                    frontImage.src = 'https://via.placeholder.com/400x500/1a1a2e/667eea?text=ORCA+FRONT';
+                    onLoad();
+                };
+                frontImage.src = `${baseUrls.front}?t=${timestamp}`;
+                
+                backImage.onload = onLoad;
+                backImage.onerror = () => {
+                    backImage.src = 'https://via.placeholder.com/400x500/1a1a2e/764ba2?text=ORCA+BACK';
+                    onLoad();
+                };
+                backImage.src = `${baseUrls.back}?t=${timestamp}`;
+            });
+        }
+
+        function updateIdDisplay(orcaId, data) {
+            const number = extractNumber(orcaId);
+            currentOrcaId = number;
+            document.getElementById('editionId').textContent = orcaId.toUpperCase();
+            document.getElementById('certificateId').textContent = `ORCA-GENESIS-${number}`;
+            document.getElementById('headerEdition').textContent = number;
+            
+            if (data) {
+                document.getElementById('colorValue').textContent = data.warna || '-';
+                document.getElementById('sizeValue').textContent = data.ukuran || '-';
+            }
+        }
+
+        async function submitId() {
+            const idInput = document.getElementById('idInput');
+            const sigInput = document.getElementById('signatureInput');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            const id = idInput.value.trim().toLowerCase();
+            const signature = sigInput.value.trim().toUpperCase();
+            
+            // Validasi input
+            if (!id || !signature) {
+                errorMsg.textContent = '⚠️ Please enter both ID and signature';
+                errorMsg.style.color = '#ff6b6b';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            if (!validateOrcaId(id)) {
+                errorMsg.textContent = '⚠️ Invalid ID format. Use: orca.XX.XX.XXX';
+                errorMsg.style.color = '#ff6b6b';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            if (signature.length !== 6) {
+                errorMsg.textContent = '⚠️ Signature must be 6 characters';
+                errorMsg.style.color = '#ff6b6b';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            // Show loading
+            errorMsg.textContent = '🔄 Verifying...';
+            errorMsg.style.color = '#667eea';
+            errorMsg.style.display = 'block';
+            
+            // Load database if not loaded
+            if (!orcaDatabase) {
+                const loaded = await loadDatabase();
+                if (!loaded) {
+                    errorMsg.textContent = '⚠️ Failed to load database';
+                    errorMsg.style.color = '#ff6b6b';
+                    return;
+                }
+            }
+            
+            // Check if ID exists
+            const data = orcaDatabase[id];
+            if (!data) {
+                errorMsg.textContent = '⚠️ Invalid ID';
+                errorMsg.style.color = '#ff6b6b';
+                return;
+            }
+            
+            // Hash signature and verify
+            const hashedSig = await sha256(signature);
+            if (hashedSig !== data.hash) {
+                errorMsg.textContent = '⚠️ Invalid signature';
+                errorMsg.style.color = '#ff6b6b';
+                return;
+            }
+            
+            // Success
+            sessionStorage.setItem('orca_verified', 'true');
+            sessionStorage.setItem('orca_id', id);
+            sessionStorage.setItem('orca_data', JSON.stringify(data));
+            
+            window.history.pushState({}, '', `${window.location.pathname}?id=${encodeURIComponent(id)}`);
+            const modal = document.getElementById('idModal');
+            modal.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+            updateIdDisplay(id, data);
+        }
+
+        function flipImage() {
+            isFlipped = !isFlipped;
+            document.getElementById('flipCard').classList.toggle('flipped');
+            document.getElementById('dotFront').classList.toggle('active');
+            document.getElementById('dotBack').classList.toggle('active');
+        }
+
+        function zoomIn() {
+            currentScale = Math.min(currentScale + 0.2, 2.5);
+            document.querySelectorAll('.design-image').forEach(img => img.style.transform = `scale(${currentScale})`);
+        }
+
+        function zoomOut() {
+            currentScale = Math.max(currentScale - 0.2, 0.5);
+            document.querySelectorAll('.design-image').forEach(img => img.style.transform = `scale(${currentScale})`);
+        }
+
+        function resetView() {
+            currentScale = 1;
+            document.querySelectorAll('.design-image').forEach(img => img.style.transform = 'scale(1)');
+            if (isFlipped) flipImage();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            if (e.key === 'ArrowLeft' && isFlipped) flipImage();
+            if (e.key === 'ArrowRight' && !isFlipped) flipImage();
+            if (e.key === '+' || e.key === '=') zoomIn();
+            if (e.key === '-' || e.key === '_') zoomOut();
+            if (e.key === '0') resetView();
+            if (e.key === ' ') { flipImage(); e.preventDefault(); }
+        });
+
+        let touchStartX, touchEndX, touchStartY, touchEndY, isSwiping;
+        const container = document.querySelector('.image-container');
+        container.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+            isSwiping = true;
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+            if (!isSwiping) return;
+            const dx = Math.abs(e.changedTouches[0].screenX - touchStartX);
+            const dy = Math.abs(e.changedTouches[0].screenY - touchStartY);
+            if (dx > dy && dx > 10) e.preventDefault();
+        }, { passive: false });
+
+        container.addEventListener('touchend', (e) => {
+            if (!isSwiping) return;
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            const dx = touchStartX - touchEndX;
+            const dy = Math.abs(touchStartY - touchEndY);
+            if (dy < 100 && Math.abs(dx) > 50) {
+                if (dx > 0 && !isFlipped) flipImage();
+                else if (dx < 0 && isFlipped) flipImage();
+            }
+            isSwiping = false;
+        }, { passive: true });
+
+        document.getElementById('idInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') { 
+                e.preventDefault(); 
+                document.getElementById('signatureInput').focus();
             }
         });
-    });
-</script>
+
+        document.getElementById('signatureInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') { 
+                e.preventDefault(); 
+                submitId();
+            }
+        });
+
+        document.getElementById('idInput').addEventListener('input', () => {
+            document.getElementById('errorMessage').style.display = 'none';
+        });
+
+        document.getElementById('signatureInput').addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+            document.getElementById('errorMessage').style.display = 'none';
+        });
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Load database
+            await loadDatabase();
+            
+            // Check if already verified
+            const verified = sessionStorage.getItem('orca_verified');
+            const storedId = sessionStorage.getItem('orca_id');
+            const storedData = sessionStorage.getItem('orca_data');
+            
+            if (verified && storedId && storedData) {
+                document.getElementById('idModal').style.display = 'none';
+                updateIdDisplay(storedId, JSON.parse(storedData));
+            }
+            
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', month: 'short', day: 'numeric' 
+            });
+            loadImages();
+
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('navbarMenu');
+                const toggle = document.getElementById('menuToggle');
+                if (menu.classList.contains('active') && !menu.contains(e.target) && !toggle.contains(e.target)) {
+                    toggleMenu();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
