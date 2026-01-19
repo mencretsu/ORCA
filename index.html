@@ -762,9 +762,9 @@
         <div class="modal-content">
             <div class="modal-icon">🐋</div>
             <h2>ORCA</h2>
-            <p>Enter your unique edition ID and signature</p>
+            <p>Enter your unique edition ID and password</p>
             <input type="text" id="idInput" placeholder="orca.xx.xx.xxx" autofocus autocomplete="off" maxlength="15">
-            <input type="text" id="signatureInput" placeholder="Signature (6 chars)" autocomplete="off" maxlength="6" style="text-transform: uppercase;">
+            <input type="text" id="signatureInput" placeholder="Password" autocomplete="off" maxlength="6" style="text-transform: uppercase;">
             <div id="errorMessage" class="error-message" style="display: none;"></div>
             <button onclick="submitId()">Verify & Enter</button>
             <button onclick="window.location.href='https://www.orcaorigin.store/home'">ORCA Homepage</button>
@@ -836,7 +836,7 @@
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Print Type</div>
-                            <div class="detail-value">DTF Premium</div>
+                            <div class="detail-value">Plastisol Premium</div>
                         </div>
                     </div>
                     <div class="certificate">
@@ -875,7 +875,8 @@
         // Mapping warna ke prefix file
         const colorMap = {
             'Black': 'b',      // bback.png, bfront.png
-            'White': 'w'
+            'White': 'w',      // wback.png, wfront.png
+            'hitam putih': 'b' // default ke hitam
         };
 
         // SHA-256 hash function
@@ -1003,7 +1004,7 @@
             }
             
             if (signature.length !== 6) {
-                errorMsg.textContent = '⚠️ Password must be 6 characters';
+                errorMsg.textContent = '⚠️ password must be 6 characters';
                 errorMsg.style.color = '#ff6b6b';
                 errorMsg.style.display = 'block';
                 return;
@@ -1035,7 +1036,7 @@
             // Hash signature and verify
             const hashedSig = await sha256(signature);
             if (hashedSig !== data.hash) {
-                errorMsg.textContent = '⚠️ Invalid Password';
+                errorMsg.textContent = '⚠️ Invalid password';
                 errorMsg.style.color = '#ff6b6b';
                 return;
             }
@@ -1147,18 +1148,7 @@
             
             if (verified && storedId && storedData) {
                 document.getElementById('idModal').style.display = 'none';
-                const parsedData = JSON.parse(storedData);
-                updateIdDisplay(storedId, parsedData);
-                
-                // Load images sesuai warna dari stored data
-                const warna = parsedData.warna.toLowerCase();
-                let colorPrefix = 'b';
-                if (warna.includes('White') && !warna.includes('Black')) {
-                    colorPrefix = 'w';
-                } else if (warna.includes('White')) {
-                    colorPrefix = 'b';
-                }
-                loadImages(colorPrefix);
+                updateIdDisplay(storedId, JSON.parse(storedData));
             } else {
                 // Load default images jika belum verify
                 loadImages('b');
