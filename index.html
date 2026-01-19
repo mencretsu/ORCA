@@ -762,9 +762,9 @@
         <div class="modal-content">
             <div class="modal-icon">🐋</div>
             <h2>ORCA</h2>
-            <p>Enter your unique edition ID and password</p>
+            <p>Enter your unique edition ID and signature</p>
             <input type="text" id="idInput" placeholder="orca.xx.xx.xxx" autofocus autocomplete="off" maxlength="15">
-            <input type="text" id="signatureInput" placeholder="Password" autocomplete="off" maxlength="6" style="text-transform: uppercase;">
+            <input type="text" id="signatureInput" placeholder="Signature (6 chars)" autocomplete="off" maxlength="6" style="text-transform: uppercase;">
             <div id="errorMessage" class="error-message" style="display: none;"></div>
             <button onclick="submitId()">Verify & Enter</button>
             <button onclick="window.location.href='https://www.orcaorigin.store/home'">ORCA Homepage</button>
@@ -859,7 +859,7 @@
 
     <div class="footer">
         <p>Scanned from official ORCA QR code • <span id="currentDate">-</span></p>
-        <p>© 2024 ORCA Limited Edition Collection</p>
+        <p>© 2025 ORCA Limited Edition Collection</p>
         <p class="domain">orcaorigin.store</p>
     </div>
 
@@ -874,8 +874,8 @@
         
         // Mapping warna ke prefix file
         const colorMap = {
-            'hitam': 'b',      // bback.png, bfront.png
-            'putih': 'w',      // wback.png, wfront.png
+            'Black': 'b',      // bback.png, bfront.png
+            'White': 'w',      // wback.png, wfront.png
             'hitam putih': 'b' // default ke hitam
         };
 
@@ -970,9 +970,9 @@
                 const warna = data.warna.toLowerCase();
                 let colorPrefix = 'b'; // default hitam
                 
-                if (warna.includes('putih') && !warna.includes('hitam')) {
+                if (warna.includes('White') && !warna.includes('Black')) {
                     colorPrefix = 'w'; // putih
-                } else if (warna.includes('hitam')) {
+                } else if (warna.includes('Black')) {
                     colorPrefix = 'b'; // hitam
                 }
                 
@@ -1004,7 +1004,7 @@
             }
             
             if (signature.length !== 6) {
-                errorMsg.textContent = '⚠️ password must be 6 characters';
+                errorMsg.textContent = '⚠️ Password must be 6 characters';
                 errorMsg.style.color = '#ff6b6b';
                 errorMsg.style.display = 'block';
                 return;
@@ -1036,7 +1036,7 @@
             // Hash signature and verify
             const hashedSig = await sha256(signature);
             if (hashedSig !== data.hash) {
-                errorMsg.textContent = '⚠️ Invalid password';
+                errorMsg.textContent = '⚠️ Invalid Password';
                 errorMsg.style.color = '#ff6b6b';
                 return;
             }
@@ -1148,7 +1148,18 @@
             
             if (verified && storedId && storedData) {
                 document.getElementById('idModal').style.display = 'none';
-                updateIdDisplay(storedId, JSON.parse(storedData));
+                const parsedData = JSON.parse(storedData);
+                updateIdDisplay(storedId, parsedData);
+                
+                // Load images sesuai warna dari stored data
+                const warna = parsedData.warna.toLowerCase();
+                let colorPrefix = 'b';
+                if (warna.includes('White') && !warna.includes('Black')) {
+                    colorPrefix = 'w';
+                } else if (warna.includes('White')) {
+                    colorPrefix = 'b';
+                }
+                loadImages(colorPrefix);
             } else {
                 // Load default images jika belum verify
                 loadImages('b');
