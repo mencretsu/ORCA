@@ -145,7 +145,7 @@
   },
   "orca.01.26.025": {
     "hash": "ea5d41f79a71fef844a8f74f0c11a658c9fab889a1dfdabcbe055d8274aaf5d2",
-    "warna": "White",
+    "warna": "Black",
     "ukuran": "L",
     "link": "https://example.com/orca/025"
   },
@@ -181,8 +181,8 @@
   },
   "orca.01.26.031": {
     "hash": "3662223c3fbf2287eaae7c12df9fc3a53813ac02bb2afff8808f8a8dcfaf0e5d",
-    "warna": "hitam putih",
-    "ukuran": "L",
+    "warna": "White",
+    "ukuran": "XL",
     "link": "https://example.com/orca/031"
   },
   "orca.01.26.032": {
@@ -251,16 +251,16 @@
     "ukuran": "L",
     "link": "https://example.com/orca/042"
   },
-  "orca.01.26.043": {
+  "orca.01.26.004": {
     "hash": "de7abbd718c361c708a4f4d57bdd8af0a856b3ec9745e7e4679c71fcfab0d7e9",
-    "warna": "hitam putih",
+    "warna": "White",
     "ukuran": "L",
     "link": "https://example.com/orca/043"
   },
-  "orca.01.26.044": {
+  "orca.01.26.025": {
     "hash": "cc16096ddf7afbe3e88f79cbb3c23aeb3c9ce74706ff166e7bf20887168df26e",
-    "warna": "hitam putih",
-    "ukuran": "XL",
+    "warna": "White",
+    "ukuran": "L",
     "link": "https://example.com/orca/044"
   },
   "orca.01.26.045": {
